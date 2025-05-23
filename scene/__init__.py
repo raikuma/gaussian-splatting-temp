@@ -41,7 +41,7 @@ class Scene:
         self.test_cameras = {}
 
         if os.path.exists(os.path.join(args.source_path, "sparse", "1")):
-            scene_info = sceneLoadTypeCallbacks["Colmap"](args.source_path, args.images, args.depths, args.eval, args.train_test_exp)
+            scene_info = sceneLoadTypeCallbacks["Combined"](args.source_path, args.images, args.depths, args.eval, args.train_test_exp)
         elif os.path.exists(os.path.join(args.source_path, "nerfstudio")): # Scannet++
             scene_info = sceneLoadTypeCallbacks["ScanNet"](args.source_path, args.white_background, args.depths, args.eval, args.img_ext)
         elif os.path.exists(os.path.join(args.source_path, "sparse")):
