@@ -387,7 +387,7 @@ def readNerfSyntheticInfo2(path, white_background, depths, eval, extension=".png
     train_cam_infos = []
     test_cam_infos = []
     for cam in cam_infos:
-        if cam.image_name+'.JPG' in test_list:
+        if cam.image_name in test_list:
             test_cam_infos.append(cam)
         else:
             train_cam_infos.append(cam)
