@@ -320,7 +320,16 @@ def readCamerasFromTransforms2(path, transformsfile, depths_folder, white_backgr
 
     with open(os.path.join(path, transformsfile)) as json_file:
         contents = json.load(json_file)
-        fovx = contents["camera_angle_x"]
+        # fovx = contents["camera_angle_x"]
+
+        fl_x = contents["fl_x"]
+        fl_y = contents["fl_y"]
+        cx = contents["cx"]
+        cy = contents["cy"]
+        w = contents["w"]
+        h = contents["h"]
+        FovY = focal2fov(fl_y, h)
+        FovX = focal2fov(fl_x, w)
 
         frames = contents["frames"]
         for idx, frame in enumerate(frames):
@@ -338,25 +347,26 @@ def readCamerasFromTransforms2(path, transformsfile, depths_folder, white_backgr
 
             image_path = os.path.join(path, cam_name)
             image_name = Path(cam_name).stem
-            image = Image.open(image_path)
+            # image = Image.open(image_path)
+            # image = image_path
 
-            im_data = np.array(image.convert("RGBA"))
+            # im_data = np.array(image.convert("RGBA"))
 
-            bg = np.array([1,1,1]) if white_background else np.array([0, 0, 0])
+            # bg = np.array([1,1,1]) if white_background else np.array([0, 0, 0])
 
-            norm_data = im_data / 255.0
-            arr = norm_data[:,:,:3] * norm_data[:, :, 3:4] + bg * (1 - norm_data[:, :, 3:4])
-            image = Image.fromarray(np.array(arr*255.0, dtype=np.byte), "RGB")
+            # norm_data = im_data / 255.0
+            # arr = norm_data[:,:,:3] * norm_data[:, :, 3:4] + bg * (1 - norm_data[:, :, 3:4])
+            # image = Image.fromarray(np.array(arr*255.0, dtype=np.byte), "RGB")
 
-            fovy = focal2fov(fov2focal(fovx, image.size[0]), image.size[1])
-            FovY = fovy 
-            FovX = fovx
+            # fovy = focal2fov(fov2focal(fovx, image.size[0]), image.size[1])
+            # FovY = fovy 
+            # FovX = fovx
 
             depth_path = os.path.join(depths_folder, f"{image_name}.png") if depths_folder != "" else ""
 
             cam_infos.append(CameraInfo(uid=idx, R=R, T=T, FovY=FovY, FovX=FovX,
                             image_path=image_path, image_name=image_name,
-                            width=image.size[0], height=image.size[1], depth_path=depth_path, depth_params=None, is_test=is_test))
+                            width=w, height=h, depth_path=depth_path, depth_params=None, is_test=is_test))
             
     return cam_infos
 
@@ -364,9 +374,22 @@ def readNerfSyntheticInfo2(path, white_background, depths, eval, extension=".png
 
     depths_folder=os.path.join(path, depths) if depths != "" else ""
     print("Reading Training Transforms")
-    train_cam_infos = readCamerasFromTransforms2(path, "transforms_train.json", depths_folder, white_background, False, extension)
-    print("Reading Test Transforms")
-    test_cam_infos = readCamerasFromTransforms2(path, "transforms_test.json", depths_folder, white_background, True, extension)
+    cam_infos = readCamerasFromTransforms2(path, "nerfstudio", "transforms_undistorted.json", depths_folder, white_background, False, extension)
+    # print("Reading Test Transforms")
+    # test_cam_infos = readCamerasFromTransforms2(path, "transforms_test.json", depths_folder, white_background, True, extension)
+    
+    train_test_split = open(os.path.join(path, "train_test_lists.json"), 'r')
+    train_test_split = json.load(train_test_split)
+    train_list = train_test_split["train"]
+    test_list = train_test_split["test"]
+
+    train_cam_infos = []
+    test_cam_infos = []
+    for cam in cam_infos:
+        if cam.image_name in test_list:
+            test_cam_infos.append(cam)
+        else:
+            train_cam_infos.append(cam)
     
     if not eval:
         train_cam_infos.extend(test_cam_infos)
