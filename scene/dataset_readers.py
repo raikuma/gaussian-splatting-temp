@@ -338,9 +338,9 @@ def readCamerasFromTransforms2(path, transformsfile, depths_folder, white_backgr
 
             # NeRF 'transform_matrix' is a camera-to-world transform
             c2w = np.array(frame["transform_matrix"])
-            camera_to_world[2, :] *= -1
-            camera_to_world = camera_to_world[np.array([1, 0, 2, 3]), :]
-            camera_to_world[0:3, 1:3] *= -1
+            c2w[2, :] *= -1
+            c2w = c2w[np.array([1, 0, 2, 3]), :]
+            c2w[0:3, 1:3] *= -1
 
             # get the world-to-camera transform and set R, T
             w2c = np.linalg.inv(c2w)
