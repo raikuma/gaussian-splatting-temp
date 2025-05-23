@@ -318,7 +318,7 @@ def readNerfSyntheticInfo(path, white_background, depths, eval, extension=".png"
 def readCamerasFromTransforms2(path, transformsfile, depths_folder, white_background, is_test, extension=".png"):
     cam_infos = []
 
-    with open(os.path.join(path, transformsfile)) as json_file:
+    with open(os.path.join(path, "nerfstudio", transformsfile)) as json_file:
         contents = json.load(json_file)
         # fovx = contents["camera_angle_x"]
 
@@ -333,7 +333,8 @@ def readCamerasFromTransforms2(path, transformsfile, depths_folder, white_backgr
 
         frames = contents["frames"]
         for idx, frame in enumerate(frames):
-            cam_name = os.path.join(path, frame["file_path"] + extension)
+            # cam_name = os.path.join(path, frame["file_path"] + extension)
+            cam_name = frame["file_path"]
 
             # NeRF 'transform_matrix' is a camera-to-world transform
             c2w = np.array(frame["transform_matrix"])
@@ -345,7 +346,7 @@ def readCamerasFromTransforms2(path, transformsfile, depths_folder, white_backgr
             R = np.transpose(w2c[:3,:3])  # R is stored transposed due to 'glm' in CUDA code
             T = w2c[:3, 3]
 
-            image_path = os.path.join(path, cam_name)
+            image_path = os.path.join(path, "dslr", cam_name)
             image_name = Path(cam_name).stem
             # image = Image.open(image_path)
             # image = image_path
@@ -374,7 +375,7 @@ def readNerfSyntheticInfo2(path, white_background, depths, eval, extension=".png
 
     depths_folder=os.path.join(path, depths) if depths != "" else ""
     print("Reading Training Transforms")
-    cam_infos = readCamerasFromTransforms2(path, "nerfstudio", "transforms_undistorted.json", depths_folder, white_background, False, extension)
+    cam_infos = readCamerasFromTransforms2(path, "transforms_undistorted.json", depths_folder, white_background, False, extension)
     # print("Reading Test Transforms")
     # test_cam_infos = readCamerasFromTransforms2(path, "transforms_test.json", depths_folder, white_background, True, extension)
     
