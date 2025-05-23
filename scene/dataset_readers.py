@@ -331,7 +331,7 @@ def readCamerasFromTransforms2(path, transformsfile, depths_folder, white_backgr
         FovY = focal2fov(fl_y, h)
         FovX = focal2fov(fl_x, w)
 
-        frames = contents["frames"]
+        frames = contents["frames"] + contents["test_frames"]
         for idx, frame in enumerate(frames):
             # cam_name = os.path.join(path, frame["file_path"] + extension)
             cam_name = frame["file_path"]
