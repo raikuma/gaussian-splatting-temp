@@ -15,6 +15,7 @@ import numpy as np
 from utils.graphics_utils import getWorld2View2, getProjectionMatrix
 from utils.general_utils import PILtoTorch
 import cv2
+from PIL import Image
 
 class Camera(nn.Module):
     def __init__(self, resolution, colmap_id, R, T, FoVx, FoVy, depth_params, image, invdepthmap,
@@ -96,7 +97,8 @@ class Camera(nn.Module):
 
     @property
     def original_image(self):
-        resized_image_rgb = PILtoTorch(self.image_path, self.resolution)
+        image = Image.open(self.image_path)
+        resized_image_rgb = PILtoTorch(image, self.resolution)
         gt_image = resized_image_rgb[:3, ...]
         return gt_image.clamp(0.0, 1.0).to(self.data_device)
         
