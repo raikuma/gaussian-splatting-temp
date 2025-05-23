@@ -347,7 +347,7 @@ def readCamerasFromTransforms2(path, transformsfile, depths_folder, white_backgr
             T = w2c[:3, 3]
 
             image_path = os.path.join(path, "dslr", cam_name)
-            image_name = Path(cam_name).stem
+            image_name = cam_name
             # image = Image.open(image_path)
             # image = image_path
 
